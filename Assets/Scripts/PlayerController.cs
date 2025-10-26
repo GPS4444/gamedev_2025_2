@@ -1,20 +1,20 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public GameObject projectilePrefab;
-    public GameObject player;
+    [SerializeField] GameObject projectilePrefab;
 
-    [SerializeField] float turnSpeed = 0.1f;
-    [SerializeField] float turnAngle = 20.0f;
 
+    [Header("Movement")]
     [SerializeField] float speed = 10.0f;   
-    private float horizontalInput;
-    private float verticalInput;
+    [SerializeField] float rotationSpeed = 1.0f;
+    [SerializeField] float maxAngle = 20.0f;
 
-    private Vector3 pos;
+    [Header("Clamp")]
     [SerializeField] float zRange = 15.0f;
     [SerializeField] float xRange = 16.0f;
 
@@ -26,19 +26,19 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         //movement
-        horizontalInput = Input.GetAxis("Horizontal");
-        verticalInput = Input.GetAxis("Vertical");
+        float horizontalInput = Input.GetAxis("Horizontal");
+        float verticalInput = Input.GetAxis("Vertical");
 
         transform.Translate(horizontalInput * Time.deltaTime * speed * Vector3.right, Space.World);
         transform.Translate(verticalInput * Time.deltaTime * speed * Vector3.forward, Space.World);
 
-        //slight turn
-        if (transform.rotation.eulerAngles.y < turnAngle)
+        //slight turn 
+        if (horizontalInput != 0)
         {
-            Debug.Log(transform.rotation.eulerAngles.y);
-            transform.Rotate(0, horizontalInput * turnSpeed, 0);
+            float angle = Mathf.LerpAngle(transform.eulerAngles.y, Mathf.Clamp(Mathf.Atan(horizontalInput / verticalInput) * Mathf.Rad2Deg, -maxAngle, maxAngle), Time.deltaTime * rotationSpeed);
+            transform.eulerAngles = new Vector3(transform.eulerAngles.x, angle, transform.eulerAngles.z);
         }
-
+        
         //shoot food
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -46,9 +46,10 @@ public class PlayerController : MonoBehaviour
         }
 
         //clamp
+        Vector3 pos; 
         pos = transform.position;
         pos.x = Mathf.Clamp(transform.position.x, -xRange, xRange);
-        pos.z = Mathf.Clamp(transform.position.z, ((zRange - 15 ) * -1), zRange);
+        pos.z = Mathf.Clamp(transform.position.z, (zRange - 15 ) * -1, zRange);
         transform.position = pos;
     }
 }
