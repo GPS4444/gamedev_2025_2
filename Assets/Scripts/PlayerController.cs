@@ -1,4 +1,4 @@
-using System;
+    using System;
 using System.Diagnostics.CodeAnalysis;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -34,7 +34,7 @@ public class PlayerController : MonoBehaviour
 
         //slight turn 
         if (horizontalInput != 0)
-        {
+        {   
             float angle = Mathf.LerpAngle(transform.eulerAngles.y, Mathf.Clamp(Mathf.Atan(horizontalInput / verticalInput) * Mathf.Rad2Deg, -maxAngle, maxAngle), Time.deltaTime * rotationSpeed);
             transform.eulerAngles = new Vector3(transform.eulerAngles.x, angle, transform.eulerAngles.z);
         }
